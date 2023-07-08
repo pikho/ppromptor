@@ -1,0 +1,22 @@
+[
+    {
+        "input": "small",
+        "output": "big"
+    },
+    {
+        "input": "beautiful",
+        "output": "ugly"
+    },
+    {
+        "input": "good",
+        "output": "bad"
+    },
+    {
+        "input": "long",
+        "output": "short"
+    },
+    {
+        "input": "near",
+        "output": "far"
+    }
+]

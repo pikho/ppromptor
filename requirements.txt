@@ -1,0 +1,10 @@
+loguru
+langchain
+dataclasses_json
+
+torch
+auto_gptq
+requests
+openai
+
+beautifulsoup4
