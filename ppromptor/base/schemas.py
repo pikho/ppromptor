@@ -1,6 +1,6 @@
 import textwrap
 from dataclasses import dataclass, field
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from dataclasses_json import dataclass_json
 from langchain.prompts import PromptTemplate
@@ -53,12 +53,13 @@ class IOPair:
 
 
 @dataclass
-class Result:
+class EvalResult:
+    evaluator_name: str
     prompt: PromptCandidate
     data: IOPair
     prediction: str
     scores: Dict[str, float]
-    llm_params: Dict[str, Union[float, str]]
+    llm_params: Dict[str, Any]
 
     def __str__(self):
         return (f"Input: [{self.data.input}],"
@@ -79,11 +80,8 @@ class Recommendation():
 
 @dataclass
 class Analysis:
+    analyzer_name: str
     original_prompt: PromptCandidate
-    results: List[Result]
+    llm_params: Dict
+    results: List[EvalResult]
     recommendation: Recommendation
-
-
-@dataclass
-class Scrapchbook:
-    analyses: List[Analysis]

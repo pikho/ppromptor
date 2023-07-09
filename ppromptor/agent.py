@@ -15,15 +15,17 @@ class BaseAgent:
         self.eval_llm = eval_llm
         self.analysis_llm = analysis_llm
 
-    def run(self, dataset):
+    def run(self, dataset) -> None:
         pass
 
 
 class SimpleAgent(BaseAgent):
-    def run(self, dataset):
+    def run(self, dataset) -> None:
         candidates: List[PromptCandidate] = []
 
         while True:
+
+            # 1. Propose Candidates
             if len(candidates) <= 0:
                 proposer = Proposer(self.analysis_llm)
                 candidate = proposer.propose(dataset)
@@ -34,15 +36,16 @@ class SimpleAgent(BaseAgent):
 
             print("evaluatee_prompt", evaluatee_prompt)
 
-            evaluator = Evaluator()
+            # 2. Evaluate Candidates and Generate EvalResults
+            evaluator = Evaluator(self.eval_llm)
             evaluator.add_score_func(SequenceMatcherScore(llm=None))
             results = []
 
             for rec in dataset:
-                res = evaluator.eval(rec, candidate, self.eval_llm)
+                res = evaluator.eval(rec, candidate)
                 results.append(res)
 
-            final_score = 0
+            final_score: float = 0.0
             for res in results:
                 for key, value in res.scores.items():
                     final_score += value
@@ -51,6 +54,7 @@ class SimpleAgent(BaseAgent):
 
             reports = []
 
+            # 3. Analyze EvalResults and Generate Analysis and Recommendation
             analyzer = Analyzer(llm=self.analysis_llm)
 
             analysis = analyzer.analyze(candidate, results)

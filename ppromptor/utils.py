@@ -1,8 +1,15 @@
 import textwrap
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 from langchain.prompts import PromptTemplate
 from loguru import logger
+
+
+def get_llm_params(llm) -> Dict:
+    res = {}
+    res["llm_name"] = llm.__class__.__name__
+    res.update(llm._default_params)
+    return res
 
 
 def bulletpointize(lst):
@@ -26,7 +33,7 @@ def evaluate_guideline_contribution(evaluator,
 
 def gen_prompt(goal: Union[str, PromptTemplate],
                instrutions: Union[str, PromptTemplate],
-               guidelines: Optional[Union[str, PromptTemplate]] = None,
+               guidelines: Optional[Union[str, PromptTemplate, list]] = None,
                examples: Optional[Union[str, PromptTemplate]] = None,
                input_variables: Optional[list] = None):
 

@@ -39,7 +39,7 @@ if __name__ == '__main__':
         parser.add_argument(
             '--analysis_llm',
             required=True,
-            choices=('wizardlm', 'chatgpt', 'mlego_wizardlm'),            
+            choices=('wizardlm', 'chatgpt', 'mlego_wizardlm'),
             help='Name of LLM to use as analyzer')
 
         return parser.parse_args()

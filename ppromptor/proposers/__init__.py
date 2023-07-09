@@ -4,59 +4,21 @@ import textwrap
 from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
 from ppromptor.base.schemas import PromptCandidate
+from ppromptor.config import PP_VERBOSE
 from ppromptor.utils import gen_prompt
 
 
 class BaseProposer:
-    def __init__(self, llm):
+    def __init__(self, llm) -> None:
         self.llm = llm
+        self.prompt: PromptTemplate
 
     def propose(self, data) -> PromptCandidate:  # type: ignore[empty-body]
         pass
 
 
 class Proposer(BaseProposer):
-    def __init__(self, llm):
-        self.llm = llm
-
-    # def propose(self, data):
-    #     goal = """
-    #     Your job is to create a prompt or instruction in human language
-    #     that can guide an language model to generate the given ouput,
-    #     according to the given inputs.
-    #     """
-
-    #     guidelines = [
-    #         "Generate the instruction in an abstract and generalized manner.",
-    #         "Never disclose any example in the instruction",
-    #         "Your final answer should be limited to 8 words",
-    #     ]
-
-    #     examples = """
-    #     Below is a list of example input-output pairs:
-
-    #     {examples}
-    #     """
-
-    #     examples_prompt = PromptTemplate(
-    #         template=examples, input_variables=["examples"])
-
-    #     instrutions = """
-    #     Please provide the prompt/instruction used to generate these pairs.
-    #     Let’s think step by step and then write down the final anwser
-    #     in the form of :"INSTRUCTION: the final instruction".
-    #     """
-
-    #     prompt = gen_prompt(goal=goal, instrutions=instrutions,
-    #                         guidelines=guidelines, examples=examples_prompt)
-
-    #     chain = LLMChain(llm=self.llm, prompt=prompt, verbose=False)
-    #     res = chain({"examples": "\n".join([f"{v+1}. {str(x)}" for v, x in enumerate(data)])})
-
-    #     evaluatee_prompt = res["text"].replace("INSTRUCTION:", "").strip()
-
-    #     return evaluatee_prompt
-    def propose(self, data):
+    def __init__(self, llm) -> None:
         goal = """Your job is to design an LLM AI robot to generate 
         the below ouputs, according to the given inputs. The LLM AI robot
         is equipped with a pretrained LLM to generate outputs. You need to
@@ -96,10 +58,16 @@ class Proposer(BaseProposer):
         that can generate above pairs.
         """
 
-        prompt = gen_prompt(goal=goal, instrutions=instrutions,
-                            guidelines=guidelines, examples=examples_prompt)
+        super().__init__(llm)
 
-        chain = LLMChain(llm=self.llm, prompt=prompt, verbose=False)
+        self.prompt = gen_prompt(goal=goal,
+                                 instrutions=instrutions,
+                                 guidelines=guidelines,
+                                 examples=examples_prompt)
+
+    def propose(self, data):
+        chain = LLMChain(llm=self.llm, prompt=self.prompt, verbose=PP_VERBOSE)
+
         res = chain({"examples": "\n".join([f"{v+1}. {str(x)}" for v, x in enumerate(data)])})
 
         prompt_proposal = res["text"]  # .replace("INSTRUCTION:", "").strip()

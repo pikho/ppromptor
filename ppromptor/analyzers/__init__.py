@@ -1,30 +1,55 @@
 
 import re
 import textwrap
-from typing import List
+from typing import List, Union
 
 from langchain.chains.llm import LLMChain
+from langchain.llms.base import BaseLLM
 from langchain.prompts import PromptTemplate
-from ppromptor.base.schemas import Analysis, Recommendation, Result
+from ppromptor.base.schemas import (Analysis, EvalResult, PromptCandidate,
+                                    Recommendation)
+from ppromptor.config import PP_VERBOSE
 from ppromptor.loggers import logger
-from ppromptor.utils import bulletpointize
+from ppromptor.utils import bulletpointize, get_llm_params
 
 
 class BaseAnalyzer:
-    def __init__(self):
+    def __init__(self, llm: BaseLLM) -> None:
+        self._prompt: Union[PromptTemplate, None] = None
         self.template: PromptCandidate
-        self.llm: BaseLLM
+        self.llm = llm
+        self._prompt_str: str
+        self._validate_prompt()
 
-    def analyze(self, resultset: List[Result]):
+    @property
+    def prompt(self):
+        if self._prompt is None:
+            self._prompt = PromptTemplate(
+                template=textwrap.dedent(self._prompt_str),
+                input_variables=["role",
+                                 "goal",
+                                 "guidelines",
+                                 "constraints",
+                                 "prediction_anwsers",
+                                 "evaluation_scores"])
+        return self._prompt
+
+    def _validate_prompt(self):
+        assert isinstance(self._prompt_str, str)
+        assert "{role}" in self._prompt_str
+        assert "{goal}" in self._prompt_str
+        assert "{guidelines}" in self._prompt_str
+
+    def analyze(self, candidate, results: List[EvalResult]):
+        pass
+
+    def _select_results(self, results: List[EvalResult]):
         pass
 
 
-class Analyzer:
+class Analyzer(BaseAnalyzer):
     def __init__(self, llm):
-        self.llm = llm
-
-    def analyze(self, candidate, results: List[Result]):
-        prompt_str = """
+        self._prompt_str = """
         I create an LLM AI robot that work as a {role} to {goal}. This AI robot
         is equipped with a LLM to generate output and is expected to follow 
         below GUIDELINES and CONSTRAINTS. I expect to get get below answers, 
@@ -77,16 +102,15 @@ class Analyzer:
         Ok, now, lets think step by step.
 
         """
-        prompt = PromptTemplate(
-            template=textwrap.dedent(prompt_str),
-            input_variables=["role",
-                             "goal",
-                             "guidelines",
-                             "constraints",
-                             "prediction_anwsers",
-                             "evaluation_scores"])
+        super().__init__(llm)
 
-        chain = LLMChain(llm=self.llm, prompt=prompt, verbose=False)
+    def _select_results(self, results: List[EvalResult]):
+        return results
+
+    def analyze(self, candidate, results: List[EvalResult]):
+        results = self._select_results(results)
+
+        chain = LLMChain(llm=self.llm, prompt=self.prompt, verbose=PP_VERBOSE)
 
         value = {
             "role": candidate.role,
@@ -101,7 +125,9 @@ class Analyzer:
 
         recommendation = self.parse_output(res["text"])
 
-        return Analysis(candidate, results, recommendation)
+        return Analysis(self.__class__.__name__,
+                        candidate, get_llm_params(self.llm),
+                        results, recommendation)
 
     def parse_output(self, output):
 

@@ -83,6 +83,7 @@ class WizardLM(LLM):
         # TODO: fork for different parameters for different model variants.
         return WizardLM._wizard_param_names()
 
+    @property
     def _default_params(self) -> Dict[str, Any]:
         """Get the default parameters."""
         return self._wizard_default_params()
