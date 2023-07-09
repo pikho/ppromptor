@@ -61,7 +61,9 @@ class Result:
     llm_params: Dict[str, Union[float, str]]
 
     def __str__(self):
-        return f"Input: [{self.data.input}], Prediction: [{self.prediction}], Answer: [{self.data.output}]"
+        return (f"Input: [{self.data.input}],"
+                f" Prediction: [{self.prediction}],"
+                f" Answer: [{self.data.output}]")
 
 
 @dataclass
@@ -73,6 +75,7 @@ class Recommendation():
     constraints: List[str] = field(default_factory=list)
     examples: List[str] = field(default_factory=list)
     output_format: str = field(default="")
+
 
 @dataclass
 class Analysis:
