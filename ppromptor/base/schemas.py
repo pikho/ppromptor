@@ -69,9 +69,11 @@ class EvalResult:
 
 @dataclass
 class Recommendation():
+    thoughts: str
+    revision: str
+
     role: str
     goal: str
-    revision: str
     guidelines: List[str] = field(default_factory=list)
     constraints: List[str] = field(default_factory=list)
     examples: List[str] = field(default_factory=list)

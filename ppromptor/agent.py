@@ -62,13 +62,11 @@ class SimpleAgent(BaseAgent):
 
             print("\n*** Role ***")
             for rp in reports:
-                if rp.recommendation:
-                    print(rp.recommendation.role)
+                print(rp.recommendation.role)
 
             print("\n*** Goal ***")
             for rp in reports:
-                if rp.recommendation:
-                    print(rp.recommendation.goal)
+                print(rp.recommendation.goal)
 
             for i in range(len(reports)):
                 idx = (i + 1) * -1

@@ -80,9 +80,9 @@ class Analyzer(BaseAnalyzer):
         Please refer above evaluation scores and describe the difference
         between preditions and expected answers. And explain why the given 
         role, goal, guidelines and constraints produce the predictions 
-        instead of expected answers. Write down in "Explaination" Section.
+        instead of expected answers. Write down in "THOUGHTS" Section.
 
-        Then, Base on above thinking, please provide revised ROLE, GOAL, 
+        Then, Base on above thoughts, please provide revised ROLE, GOAL, 
         GUIDELINES and CONSTRAINTS that maximize evaluation 
         scores. Write down in "REVISION" section in below format:
 
@@ -134,11 +134,20 @@ class Analyzer(BaseAnalyzer):
         logger.info(f"Output: {output}")
 
         try:
+            thoughts = re.findall('(.*)REVISION',
+                                  output,
+                                  re.DOTALL | re.IGNORECASE)[0]
+        except IndexError:
+            thoughts = output
+
+        try:
             res = re.findall('REVISION(.*)',
                              output,
                              re.DOTALL | re.IGNORECASE)[0]
+            revision = res
+
         except IndexError:
-            return False
+            revision = ""
 
         try:
             role = re.findall('ROLE:(.*?)\n', res, re.IGNORECASE)[0]
@@ -169,4 +178,5 @@ class Analyzer(BaseAnalyzer):
         except IndexError:
             constraints = []
 
-        return Recommendation(role, goal, res, guidelines, constraints)
+        return Recommendation(thoughts, revision, role, goal,
+                              guidelines, constraints)
