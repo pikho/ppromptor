@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     args = parse_args()
 
-    if os.path.exists(args.database_name):
+    if args.database_name and os.path.exists(args.database_name):
         engine = create_engine(args.database_name)
         sess = get_session(engine)
         dataset = sess.query(IOPair).all()
