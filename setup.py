@@ -33,7 +33,8 @@ setup(
     scripts=['scripts/ppromptor-main.py'],
     install_requires=[
         "langchain", "loguru", "dataclasses_json",
-        "torch", "auto_gptq", "requests", "openai", "transformers"
+        "torch", "auto_gptq", "requests", "openai", "transformers",
+        "sqlalchemy"
     ],
     include_package_data=True,
     extras_require={
