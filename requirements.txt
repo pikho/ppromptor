@@ -1,6 +1,7 @@
 loguru
 langchain
 dataclasses_json
+sqlalchemy
 
 torch
 auto_gptq

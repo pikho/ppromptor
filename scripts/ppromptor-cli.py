@@ -1,9 +1,12 @@
 #!python3
 import argparse
+import os
 from typing import List
 
 from ppromptor.agent import SimpleAgent
 from ppromptor.base.schemas import IOPair
+from ppromptor.db import create_engine, get_session
+from ppromptor.loggers import logger
 
 if __name__ == '__main__':
 
@@ -42,15 +45,29 @@ if __name__ == '__main__':
             choices=('wizardlm', 'chatgpt', 'mlego_wizardlm'),
             help='Name of LLM to use as analyzer')
 
+        parser.add_argument(
+            '--database_name',
+            default=None,
+            help='Path or name of databse')
+
         return parser.parse_args()
 
     args = parse_args()
 
-    with open(args.data, 'r') as f:
-        jstr = f.read()
-        dataset = IOPair.schema().loads(jstr, many=True)  # type: ignore[attr-defined]
+    if os.path.exists(args.database_name):
+        engine = create_engine(args.database_name)
+        sess = get_session(engine)
+        dataset = sess.query(IOPair).all()
 
-    print(dataset)
+        logger.success(f"Data loaded from db: {args.database_name}")
+    else:
+        with open(args.data, 'r') as f:
+            jstr = f.read()
+            dataset = IOPair.schema().loads(jstr, many=True)  # type: ignore[attr-defined]
 
-    agent = SimpleAgent(load_lm(args.eval_llm), load_lm(args.analysis_llm))
+        logger.success(f"Data loaded from file: {args.data}")
+
+    agent = SimpleAgent(load_lm(args.eval_llm),
+                        load_lm(args.analysis_llm),
+                        db_name=args.database_name)
     agent.run(dataset)

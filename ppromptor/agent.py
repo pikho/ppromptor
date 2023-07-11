@@ -4,6 +4,7 @@ from typing import List
 from langchain.chains.llm import LLMChain
 from ppromptor.analyzers import Analyzer
 from ppromptor.base.schemas import IOPair, PromptCandidate
+from ppromptor.db import create_engine, get_session
 from ppromptor.evaluators import Evaluator
 from ppromptor.loggers import logger
 from ppromptor.proposers import Proposer
@@ -11,9 +12,14 @@ from ppromptor.scorefuncs import SequenceMatcherScore
 
 
 class BaseAgent:
-    def __init__(self, eval_llm, analysis_llm):
+    def __init__(self, eval_llm, analysis_llm, db_name=None):
         self.eval_llm = eval_llm
         self.analysis_llm = analysis_llm
+        if db_name:
+            engine = create_engine(db_name)
+            self.db_sess = get_session(engine)
+        else:
+            self.db_sess = None
 
     def run(self, dataset) -> None:
         pass
@@ -32,8 +38,11 @@ class SimpleAgent(BaseAgent):
             else:
                 candidate = candidates.pop()
 
-            evaluatee_prompt = candidate.prompt
+            if self.db_sess:
+                self.db_sess.add(candidate)
+                self.db_sess.commit()
 
+            evaluatee_prompt = candidate.prompt
             print("evaluatee_prompt", evaluatee_prompt)
 
             # 2. Evaluate Candidates and Generate EvalResults
@@ -50,11 +59,15 @@ class SimpleAgent(BaseAgent):
                 for key, value in res.scores.items():
                     final_score += value
 
+            if self.db_sess:
+                for res in results:
+                    self.db_sess.add(res)
+                self.db_sess.commit()
+
             logger.info(f"Final score: {final_score}")
 
-            reports = []
-
             # 3. Analyze EvalResults and Generate Analysis and Recommendation
+            reports = []
             analyzer = Analyzer(llm=self.analysis_llm)
 
             analysis = analyzer.analyze(candidate, results)
@@ -76,7 +89,13 @@ class SimpleAgent(BaseAgent):
                         report.recommendation.role,
                         report.recommendation.goal,
                         report.recommendation.guidelines,
-                        report.recommendation.constraints
+                        report.recommendation.constraints,
+                        examples=[],
+                        output_format=""
                     )
                 candidates.append(revised_candidate)
                 break
+
+            if self.db_sess:
+                self.db_sess.add(analysis)
+                self.db_sess.commit()

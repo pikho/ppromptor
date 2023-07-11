@@ -126,7 +126,6 @@ class Analyzer(BaseAnalyzer):
         recommendation = self.parse_output(res["text"])
 
         return Analysis(self.__class__.__name__,
-                        candidate, get_llm_params(self.llm),
                         results, recommendation)
 
     def parse_output(self, output):
@@ -179,4 +178,5 @@ class Analyzer(BaseAnalyzer):
             constraints = []
 
         return Recommendation(thoughts, revision, role, goal,
-                              guidelines, constraints)
+                              guidelines, constraints,
+                              examples=[], output_format="")
