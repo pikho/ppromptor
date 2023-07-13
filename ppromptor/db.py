@@ -1,8 +1,8 @@
+from ppromptor.base.schemas import (Analysis, EvalResult, IOPair,
+                                    PromptCandidate, Recommendation,
+                                    association_result_analysis)
 from sqlalchemy import create_engine as slc_create_engine
 from sqlalchemy.orm import Session
-
-from .base.schemas import (Analysis, EvalResult, IOPair, PromptCandidate,
-                           Recommendation, association_result_analysis)
 
 
 def create_engine(db_path, echo=False):
@@ -21,3 +21,31 @@ def create_engine(db_path, echo=False):
 def get_session(engine):
     session = Session(engine)
     return session
+
+
+def get_dataset(sess):
+    return sess.query(IOPair).all()
+
+
+def get_candidates(sess):
+    return sess.query(PromptCandidate).all()
+
+
+def get_candidate_by_id(sess, id):
+    return sess.query(PromptCandidate).filter_by(id=id)[0]
+
+
+def get_results(sess):
+    return sess.query(EvalResult).all()
+
+
+def get_analysis(sess):
+    return sess.query(Analysis).all()
+
+
+if __name__ == '__main__':
+    engine = create_engine('test3.db')
+    sess = get_session(engine)
+    dataset = get_dataset(sess)
+    breakpoint()
+    print(dataset[0])

@@ -14,6 +14,7 @@ class Base(MappedAsDataclass, DeclarativeBase):
     """subclasses will be converted to dataclasses"""
 
 
+@dataclass_json
 class PromptCandidate(Base):
     __tablename__ = "prompt_candidate"
 
@@ -65,6 +66,7 @@ class IOPair(Base):
         return f"Input: {self.input}; Output: {self.output}"
 
 
+@dataclass_json
 class EvalResult(Base):
     __tablename__ = "eval_result"
 
@@ -90,6 +92,7 @@ class EvalResult(Base):
                 f" Answer: [{self.data.output}]")
 
 
+@dataclass_json
 class Recommendation(Base):
     __tablename__ = "recommendation"
 
@@ -114,6 +117,7 @@ association_result_analysis = Table(
 )
 
 
+@dataclass_json
 class Analysis(Base):
     __tablename__ = "analysis"
 
