@@ -6,8 +6,8 @@ from typing import List, Union
 from langchain.chains.llm import LLMChain
 from langchain.llms.base import BaseLLM
 from langchain.prompts import PromptTemplate
-from ppromptor.base.schemas import (Analysis, EvalResult, PromptCandidate,
-                                    Recommendation)
+from ppromptor.base.schemas import (Analysis, EvalResult, EvalSet,
+                                    PromptCandidate, Recommendation)
 from ppromptor.config import PP_VERBOSE
 from ppromptor.loggers import logger
 from ppromptor.utils import bulletpointize, get_llm_params
@@ -40,10 +40,10 @@ class BaseAnalyzer:
         assert "{goal}" in self._prompt_str
         assert "{guidelines}" in self._prompt_str
 
-    def analyze(self, candidate, results: List[EvalResult]):
+    def analyze(self, candidate, results: List[EvalSet]):
         pass
 
-    def _select_results(self, results: List[EvalResult]):
+    def _select_results(self, results: List[EvalSet]):
         pass
 
 
@@ -104,21 +104,24 @@ class Analyzer(BaseAnalyzer):
         """
         super().__init__(llm)
 
-    def _select_results(self, results: List[EvalResult]):
+    def _select_results(self, results: List[EvalSet]):
         return results
 
-    def analyze(self, candidate, results: List[EvalResult]):
+    def analyze(self, candidate, results: List[EvalSet]):
         results = self._select_results(results)
 
         chain = LLMChain(llm=self.llm, prompt=self.prompt, verbose=PP_VERBOSE)
+
+        pred = "\n".join(["\n".join([str(x) for x in r_set.results]) for r_set in results])
+        eval_scores = "\n".join(["\n".join([str(x.scores) for x in r_set.results]) for r_set in results])
 
         value = {
             "role": candidate.role,
             "goal": candidate.goal,
             "guidelines": bulletpointize(candidate.guidelines),
             "constraints": bulletpointize(candidate.constraints),
-            "prediction_anwsers": "\n".join([str(x) for x in results]),
-            "evaluation_scores": "\n".join([str(x.scores) for x in results])
+            "prediction_anwsers": pred,
+            "evaluation_scores": eval_scores
         }
 
         res = chain(value)

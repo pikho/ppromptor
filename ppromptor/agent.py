@@ -3,7 +3,7 @@ from typing import List
 
 from langchain.chains.llm import LLMChain
 from ppromptor.analyzers import Analyzer
-from ppromptor.base.schemas import IOPair, PromptCandidate
+from ppromptor.base.schemas import EvalSet, IOPair, PromptCandidate
 from ppromptor.db import create_engine, get_session
 from ppromptor.evaluators import Evaluator
 from ppromptor.loggers import logger
@@ -48,19 +48,31 @@ class SimpleAgent(BaseAgent):
             # 2. Evaluate Candidates and Generate EvalResults
             evaluator = Evaluator(self.eval_llm)
             evaluator.add_score_func(SequenceMatcherScore(llm=None))
-            results = []
+            # results = []
+            eval_set = EvalSet(candidate)
+            scores = {}
 
             for rec in dataset:
                 res = evaluator.eval(rec, candidate)
-                results.append(res)
+                eval_set.results.append(res)
 
             final_score: float = 0.0
-            for res in results:
+            for res in eval_set.results:
                 for key, value in res.scores.items():
                     final_score += value
+                    if key not in scores:
+                        scores[key] = value
+                    else:
+                        scores[key] += value
+
+            eval_set.scores = scores
+            eval_set.final_score = final_score
+
+            self.db_sess.add(eval_set)
+            self.db_sess.commit()
 
             if self.db_sess:
-                for res in results:
+                for res in eval_set.results:
                     self.db_sess.add(res)
                 self.db_sess.commit()
 
@@ -70,7 +82,7 @@ class SimpleAgent(BaseAgent):
             reports = []
             analyzer = Analyzer(llm=self.analysis_llm)
 
-            analysis = analyzer.analyze(candidate, results)
+            analysis = analyzer.analyze(candidate, [eval_set])
             reports.append(analysis)
 
             print("\n*** Role ***")

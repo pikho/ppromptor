@@ -66,6 +66,14 @@ class IOPair(Base):
         return f"Input: {self.input}; Output: {self.output}"
 
 
+association_result_set = Table(
+    "association_result_set",
+    Base.metadata,
+    Column("eval_set_id", ForeignKey("eval_set.id")),
+    Column("eval_result_id", ForeignKey("eval_result.id")),
+)
+
+
 @dataclass_json
 class EvalResult(Base):
     __tablename__ = "eval_result"
@@ -93,6 +101,21 @@ class EvalResult(Base):
 
 
 @dataclass_json
+class EvalSet(Base):
+    __tablename__ = "eval_set"
+
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    candidate: Mapped["PromptCandidate"] = relationship()
+    results: Mapped[List[EvalResult]] = relationship(
+        secondary=association_result_set, default_factory=list)
+    scores: Mapped[Dict[str, float]] = Column(JSON, default={})
+    final_score: Mapped[float] = mapped_column(default=None)
+
+    prompt_id: Mapped[int] = mapped_column(ForeignKey("prompt_candidate.id"),
+                                           default=None)
+
+
+@dataclass_json
 class Recommendation(Base):
     __tablename__ = "recommendation"
 
@@ -109,11 +132,11 @@ class Recommendation(Base):
     output_format: Mapped[Optional[str]] = mapped_column(default=None)
 
 
-association_result_analysis = Table(
-    "association_result_analysis",
+association_resultset_analysis = Table(
+    "association_resultset_analysis",
     Base.metadata,
     Column("analysis_id", ForeignKey("analysis.id")),
-    Column("eval_result_id", ForeignKey("eval_result.id")),
+    Column("eval_set_id", ForeignKey("eval_set.id")),
 )
 
 
@@ -125,7 +148,9 @@ class Analysis(Base):
 
     analyzer_name: Mapped[str] = mapped_column()
 
-    results: Mapped[List[EvalResult]] = relationship(secondary=association_result_analysis)
+    eval_sets: Mapped[List[EvalSet]] = relationship(
+        secondary=association_resultset_analysis)
+
     recommendation: Mapped["Recommendation"] = relationship()
 
     rcm_id: Mapped[int] = mapped_column(ForeignKey("recommendation.id"),

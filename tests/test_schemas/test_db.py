@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from ppromptor.base.schemas import (Analysis, EvalResult, IOPair,
+from ppromptor.base.schemas import (Analysis, EvalResult, EvalSet, IOPair,
                                     PromptCandidate, Recommendation)
 from ppromptor.db import create_engine, get_session
 
@@ -50,6 +50,9 @@ def test_objs():
                 llm_params={}
         )
 
+        eval_set = EvalSet(candidate, [eval_result],
+                           scores={}, final_score=0.1)
+
         recomm = Recommendation(
             thoughts="",
             revision="",
@@ -63,7 +66,7 @@ def test_objs():
 
         analysis = Analysis(
             analyzer_name="test1",
-            results=[eval_result],
+            eval_sets=[eval_set],
             recommendation=recomm
         )
 

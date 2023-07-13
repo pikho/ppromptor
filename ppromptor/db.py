@@ -1,6 +1,7 @@
-from ppromptor.base.schemas import (Analysis, EvalResult, IOPair,
+from ppromptor.base.schemas import (Analysis, EvalResult, EvalSet, IOPair,
                                     PromptCandidate, Recommendation,
-                                    association_result_analysis)
+                                    association_result_set,
+                                    association_resultset_analysis)
 from sqlalchemy import create_engine as slc_create_engine
 from sqlalchemy.orm import Session
 
@@ -10,10 +11,12 @@ def create_engine(db_path, echo=False):
 
     Analysis.__table__.create(engine, checkfirst=True)
     EvalResult.__table__.create(engine, checkfirst=True)
+    EvalSet.__table__.create(engine, checkfirst=True)
     IOPair.__table__.create(engine, checkfirst=True)
     PromptCandidate.__table__.create(engine, checkfirst=True)
     Recommendation.__table__.create(engine, checkfirst=True)
-    association_result_analysis.create(engine, checkfirst=True)
+    association_result_set.create(engine, checkfirst=True)
+    association_resultset_analysis.create(engine, checkfirst=True)
 
     return engine
 
@@ -37,6 +40,10 @@ def get_candidate_by_id(sess, id):
 
 def get_results(sess):
     return sess.query(EvalResult).all()
+
+
+def get_eval_sets(sess):
+    return sess.query(EvalSet).all()
 
 
 def get_analysis(sess):
