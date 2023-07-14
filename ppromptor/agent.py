@@ -48,35 +48,16 @@ class SimpleAgent(BaseAgent):
             # 2. Evaluate Candidates and Generate EvalResults
             evaluator = Evaluator(self.eval_llm)
             evaluator.add_score_func(SequenceMatcherScore(llm=None))
-            # results = []
-            eval_set = EvalSet(candidate)
-            scores = {}
 
-            for rec in dataset:
-                res = evaluator.eval(rec, candidate)
-                eval_set.results.append(res)
-
-            final_score: float = 0.0
-            for res in eval_set.results:
-                for key, value in res.scores.items():
-                    final_score += value
-                    if key not in scores:
-                        scores[key] = value
-                    else:
-                        scores[key] += value
-
-            eval_set.scores = scores
-            eval_set.final_score = final_score
-
-            self.db_sess.add(eval_set)
-            self.db_sess.commit()
+            eval_set = evaluator.eval(dataset, candidate)
 
             if self.db_sess:
+                self.db_sess.add(eval_set)
                 for res in eval_set.results:
                     self.db_sess.add(res)
                 self.db_sess.commit()
 
-            logger.info(f"Final score: {final_score}")
+            logger.info(f"Final score: {eval_set.final_score}")
 
             # 3. Analyze EvalResults and Generate Analysis and Recommendation
             reports = []
