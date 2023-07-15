@@ -1,5 +1,5 @@
 import textwrap
-from typing import List
+from typing import List, Optional
 
 from langchain.chains.llm import LLMChain
 from langchain.chat_models import ChatOpenAI
@@ -13,8 +13,14 @@ from ppromptor.utils import bulletpointize, get_llm_params
 
 
 class BaseEvaluator:
-    def __init__(self, llm: BaseLLM) -> None:
-        self.score_funcs: List[BaseScoreFunc] = []
+    def __init__(self,
+                 llm: BaseLLM,
+                 score_funcs: Optional[List[BaseScoreFunc]] = None) -> None:
+        if score_funcs is None:
+            self.score_funcs = []
+        else:
+            self.score_funcs = score_funcs
+
         self._prompt_str: str
         self._validate_prompt()
         self.llm = llm
@@ -42,13 +48,19 @@ class BaseEvaluator:
     def add_score_func(self, score_func):
         self.score_funcs.append(score_func)
 
-    def evaluate(self, record: List[IOPair],  # type: ignore[empty-body]
+    def evaluate(self, dataset: List[IOPair],  # type: ignore[empty-body]
                  candidate: PromptCandidate) -> EvalSet:
         pass
 
+    def run_cmd(self, **kwargs):
+        return self.evaluate(**kwargs)
+
 
 class Evaluator(BaseEvaluator):
-    def __init__(self, llm: BaseLLM):
+    def __init__(self,
+                 llm: BaseLLM,
+                 score_funcs: Optional[List[BaseScoreFunc]] = None) -> None:
+
         self._prompt_str = ("You are a {role}."
                             " Base on below INPUT, {goal}\n") + """
         INPUT:
@@ -63,7 +75,7 @@ class Evaluator(BaseEvaluator):
         Please strictly follow above guidelines and constraints.
         Answer:
         """
-        super().__init__(llm)
+        super().__init__(llm, score_funcs)
 
     def _get_scores(self, results) -> dict:
         res = {}
@@ -84,14 +96,15 @@ class Evaluator(BaseEvaluator):
                 score += value
         return score
 
-    def eval(self, records: List[IOPair],
-             candidate: PromptCandidate) -> EvalSet:
+    def evaluate(self,
+                 dataset: List[IOPair],
+                 candidate: PromptCandidate) -> EvalSet:
 
         chain = LLMChain(llm=self.llm, prompt=self.prompt, verbose=PP_VERBOSE)
 
         results = []
 
-        for record in records:
+        for record in dataset:
             data = {
                 "role": candidate.role,
                 "goal": candidate.goal,

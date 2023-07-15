@@ -49,7 +49,7 @@ class SimpleAgent(BaseAgent):
             evaluator = Evaluator(self.eval_llm)
             evaluator.add_score_func(SequenceMatcherScore(llm=None))
 
-            eval_set = evaluator.eval(dataset, candidate)
+            eval_set = evaluator.evaluate(dataset, candidate)
 
             if self.db_sess:
                 self.db_sess.add(eval_set)
