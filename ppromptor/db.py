@@ -1,5 +1,5 @@
-from ppromptor.base.schemas import (Analysis, EvalResult, EvalSet, IOPair,
-                                    PromptCandidate, Recommendation,
+from ppromptor.base.schemas import (Analysis, Command, EvalResult, EvalSet,
+                                    IOPair, PromptCandidate, Recommendation,
                                     association_result_set,
                                     association_resultset_analysis)
 from sqlalchemy import create_engine as slc_create_engine
@@ -15,6 +15,7 @@ def create_engine(db_path, echo=False):
     IOPair.__table__.create(engine, checkfirst=True)
     PromptCandidate.__table__.create(engine, checkfirst=True)
     Recommendation.__table__.create(engine, checkfirst=True)
+    Command.__table__.create(engine, checkfirst=True)
     association_result_set.create(engine, checkfirst=True)
     association_resultset_analysis.create(engine, checkfirst=True)
 

@@ -8,7 +8,7 @@ from ppromptor.base.command import CommandExecutor
 from ppromptor.base.schemas import EvalSet, IOPair, PromptCandidate
 from ppromptor.db import create_engine, get_session
 from ppromptor.evaluators import Evaluator
-from ppromptor.job_queues import BaseJobQueue, PriorityJobQueue
+from ppromptor.job_queues import BaseJobQueue, ORMJobQueue, PriorityJobQueue
 from ppromptor.loggers import logger
 from ppromptor.proposers import Proposer
 from ppromptor.scorefuncs import SequenceMatcherScore
@@ -100,7 +100,7 @@ class SimpleAgent(BaseAgent):
 class JobQueueAgent(BaseAgent):
     def __init__(self, eval_llm, analysis_llm, db_name=None) -> None:
         super().__init__(eval_llm, analysis_llm, db_name)
-        self.queue: BaseJobQueue = PriorityJobQueue()
+        self.queue: BaseJobQueue = ORMJobQueue(session=self.db_sess)
 
         self._cmds: Dict[str, CommandExecutor] = {
             "Evaluator": Evaluator(self.eval_llm,
@@ -164,3 +164,4 @@ class JobQueueAgent(BaseAgent):
 
             self.queue.put({"cmd": self._follow_action[cmd],
                             "data": data}, 0)
+            self.queue.done(task, 2)

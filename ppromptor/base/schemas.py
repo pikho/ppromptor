@@ -155,3 +155,52 @@ class Analysis(Base):
 
     rcm_id: Mapped[int] = mapped_column(ForeignKey("recommendation.id"),
                                         default=None)
+
+
+@dataclass_json
+class Command(Base):
+    __tablename__ = "command"
+
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
+
+    cmd: Mapped[str] = Column(JSON)
+    """
+    {
+        "cls": str,
+        "params": {
+            "key": value
+        }
+    }
+    """
+    data: Mapped[str] = Column(JSON)
+
+    """
+    {
+        "param_key": {
+            "data_cls": str,
+            "data_id": List[int]
+        }
+    }
+    """
+    owner: Mapped[str] = mapped_column(default=None)
+    priority: Mapped[int] = mapped_column(default=0)
+    state: Mapped[int] = mapped_column(default=0)
+    # 0: waiting, 1: running, 2: successful 3: failed
+
+    @property
+    def data_obj(self):
+        return None
+
+    @property
+    def cmd_obj(self):
+        return None
+
+
+TABLE_MAP = {
+    "PromptCandidate": PromptCandidate,
+    "IOPair": IOPair,
+    "EvalResult": EvalResult,
+    "EvalSet": EvalSet,
+    "Recommendation": Recommendation,
+    "Analysis": Analysis
+}
