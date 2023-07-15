@@ -1,6 +1,7 @@
 
 import re
 import textwrap
+from abc import abstractmethod
 from typing import List, Union
 
 from langchain.chains.llm import LLMChain
@@ -40,7 +41,8 @@ class BaseAnalyzer:
         assert "{goal}" in self._prompt_str
         assert "{guidelines}" in self._prompt_str
 
-    def analyze(self, candidate, results: List[EvalSet]):
+    @abstractmethod
+    def analyze(self, candidate, eval_sets: List[EvalSet], **kwargs):
         pass
 
     def _select_results(self, results: List[EvalSet]):

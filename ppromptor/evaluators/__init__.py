@@ -1,4 +1,5 @@
 import textwrap
+from abc import abstractmethod
 from typing import List, Optional
 
 from langchain.chains.llm import LLMChain
@@ -48,6 +49,7 @@ class BaseEvaluator:
     def add_score_func(self, score_func):
         self.score_funcs.append(score_func)
 
+    @abstractmethod
     def evaluate(self, dataset: List[IOPair],  # type: ignore[empty-body]
                  candidate: PromptCandidate) -> EvalSet:
         pass

@@ -1,9 +1,13 @@
+from abc import abstractmethod
+
+
 class BaseScoreFunc:
     def __init__(self, llm=None):
         self.name = "ScoreFunc"
         self.llm = llm
 
     @classmethod
+    @abstractmethod
     def score(cls, candidate, record, prediction) -> float:  # type: ignore[empty-body]
         pass
 

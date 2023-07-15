@@ -1,5 +1,6 @@
 import re
 import textwrap
+from abc import abstractmethod
 
 from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
@@ -14,6 +15,7 @@ class BaseProposer:
         self.prompt: PromptTemplate
 
     def propose(self, data) -> PromptCandidate:  # type: ignore[empty-body]
+    @abstractmethod
         pass
 
 
