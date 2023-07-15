@@ -3,7 +3,7 @@ import argparse
 import os
 from typing import List
 
-from ppromptor.agent import SimpleAgent
+from ppromptor.agent import JobQueueAgent, SimpleAgent
 from ppromptor.base.schemas import IOPair
 from ppromptor.db import create_engine, get_session
 from ppromptor.loggers import logger
@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
         logger.success(f"Data loaded from file: {args.data}")
 
-    agent = SimpleAgent(load_lm(args.eval_llm),
-                        load_lm(args.analysis_llm),
-                        db_name=args.database_name)
+    agent = JobQueueAgent(load_lm(args.eval_llm),
+                          load_lm(args.analysis_llm),
+                          db_name=args.database_name)
     agent.run(dataset)
