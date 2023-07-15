@@ -81,7 +81,7 @@ class EvalResult(Base):
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     evaluator_name: Mapped[str] = mapped_column()
 
-    prompt: Mapped["PromptCandidate"] = relationship()
+    candidate: Mapped["PromptCandidate"] = relationship()
     data: Mapped["IOPair"] = relationship()
 
     prediction: Mapped[str] = mapped_column()
