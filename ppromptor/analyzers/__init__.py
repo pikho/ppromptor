@@ -7,6 +7,7 @@ from typing import List, Union
 from langchain.chains.llm import LLMChain
 from langchain.llms.base import BaseLLM
 from langchain.prompts import PromptTemplate
+from ppromptor.base.command import CommandExecutor
 from ppromptor.base.schemas import (Analysis, EvalResult, EvalSet,
                                     PromptCandidate, Recommendation)
 from ppromptor.config import PP_VERBOSE
@@ -14,7 +15,7 @@ from ppromptor.loggers import logger
 from ppromptor.utils import bulletpointize, get_llm_params
 
 
-class BaseAnalyzer:
+class BaseAnalyzer(CommandExecutor):
     def __init__(self, llm: BaseLLM) -> None:
         self._prompt: Union[PromptTemplate, None] = None
         self.template: PromptCandidate

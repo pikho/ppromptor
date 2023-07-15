@@ -6,6 +6,7 @@ from langchain.chains.llm import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import BaseLLM
 from langchain.prompts import PromptTemplate
+from ppromptor.base.command import CommandExecutor
 from ppromptor.base.schemas import EvalResult, EvalSet, IOPair, PromptCandidate
 from ppromptor.config import PP_VERBOSE
 from ppromptor.loggers import logger
@@ -13,7 +14,7 @@ from ppromptor.scorefuncs import BaseScoreFunc
 from ppromptor.utils import bulletpointize, get_llm_params
 
 
-class BaseEvaluator:
+class BaseEvaluator(CommandExecutor):
     def __init__(self,
                  llm: BaseLLM,
                  score_funcs: Optional[List[BaseScoreFunc]] = None) -> None:

@@ -4,12 +4,13 @@ from abc import abstractmethod
 
 from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
+from ppromptor.base.command import CommandExecutor
 from ppromptor.base.schemas import PromptCandidate
 from ppromptor.config import PP_VERBOSE
 from ppromptor.utils import gen_prompt
 
 
-class BaseProposer:
+class BaseProposer(CommandExecutor):
     def __init__(self, llm) -> None:
         self.llm = llm
         self.prompt: PromptTemplate

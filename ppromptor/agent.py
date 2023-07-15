@@ -1,13 +1,14 @@
 import argparse
 from copy import copy, deepcopy
-from queue import PriorityQueue
-from typing import List
+from typing import Dict, List
 
 from langchain.chains.llm import LLMChain
 from ppromptor.analyzers import Analyzer
+from ppromptor.base.command import CommandExecutor
 from ppromptor.base.schemas import EvalSet, IOPair, PromptCandidate
 from ppromptor.db import create_engine, get_session
 from ppromptor.evaluators import Evaluator
+from ppromptor.job_queues import BaseJobQueue, PriorityJobQueue
 from ppromptor.loggers import logger
 from ppromptor.proposers import Proposer
 from ppromptor.scorefuncs import SequenceMatcherScore
@@ -97,11 +98,11 @@ class SimpleAgent(BaseAgent):
 
 
 class JobQueueAgent(BaseAgent):
-    def __init__(self, eval_llm, analysis_llm, db_name=None):
-        self.queue = PriorityQueue()
+    def __init__(self, eval_llm, analysis_llm, db_name=None) -> None:
         super().__init__(eval_llm, analysis_llm, db_name)
+        self.queue: BaseJobQueue = PriorityJobQueue()
 
-        self._cmds = {
+        self._cmds: Dict[str, CommandExecutor] = {
             "Evaluator": Evaluator(self.eval_llm,
                                    [SequenceMatcherScore(llm=None)]),
             "Analyzer": Analyzer(self.analysis_llm),
@@ -133,12 +134,12 @@ class JobQueueAgent(BaseAgent):
             proposer = Proposer(self.analysis_llm)
             candidate = proposer.propose(dataset)
 
-            self.queue.put((0, {
+            self.queue.put({
                     "cmd": "Proposer",
                     "data": data
-                }))
+                }, 0)
 
-        while self.queue:
+        while not self.queue.empty():
             # breakpoint()
             task = self.queue.get()[1]
 
@@ -161,5 +162,5 @@ class JobQueueAgent(BaseAgent):
 
             data[self._cmd_output[cmd]] = result
 
-            self.queue.put((0, {"cmd": self._follow_action[cmd],
-                                "data": data}))
+            self.queue.put({"cmd": self._follow_action[cmd],
+                            "data": data}, 0)
