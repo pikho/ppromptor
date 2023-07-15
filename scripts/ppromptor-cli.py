@@ -67,6 +67,15 @@ if __name__ == '__main__':
 
         logger.success(f"Data loaded from file: {args.data}")
 
+        engine = create_engine(args.database_name)
+        sess = get_session(engine)
+
+        for d in dataset:
+            sess.add(d)
+
+        sess.commit()
+        logger.success(f"Data successfully inserted into db")
+
     agent = JobQueueAgent(load_lm(args.eval_llm),
                           load_lm(args.analysis_llm),
                           db_name=args.database_name)
