@@ -45,7 +45,10 @@ class BaseAnalyzer:
     def analyze(self, candidate, eval_sets: List[EvalSet], **kwargs):
         pass
 
-    def _select_results(self, results: List[EvalSet]):
+    def run_cmd(self, **kwargs):
+        return self.analyze(**kwargs)
+
+    def _select_results(self, eval_sets: List[EvalSet]):
         pass
 
 
@@ -106,11 +109,14 @@ class Analyzer(BaseAnalyzer):
         """
         super().__init__(llm)
 
-    def _select_results(self, results: List[EvalSet]):
-        return results
+    def _select_results(self, eval_sets: List[EvalSet]):
+        return eval_sets
 
-    def analyze(self, candidate, results: List[EvalSet]):
-        results = self._select_results(results)
+    def analyze(self, candidate, eval_sets: List[EvalSet], **kwargs):
+        if isinstance(eval_sets, EvalSet):
+            eval_sets = [eval_sets]
+
+        results = self._select_results(eval_sets)
 
         chain = LLMChain(llm=self.llm, prompt=self.prompt, verbose=PP_VERBOSE)
 

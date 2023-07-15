@@ -51,7 +51,8 @@ class BaseEvaluator:
 
     @abstractmethod
     def evaluate(self, dataset: List[IOPair],  # type: ignore[empty-body]
-                 candidate: PromptCandidate) -> EvalSet:
+                 candidate: PromptCandidate,
+                 **kwargs) -> EvalSet:
         pass
 
     def run_cmd(self, **kwargs):
@@ -100,7 +101,8 @@ class Evaluator(BaseEvaluator):
 
     def evaluate(self,
                  dataset: List[IOPair],
-                 candidate: PromptCandidate) -> EvalSet:
+                 candidate: PromptCandidate,
+                 **kwargs) -> EvalSet:
 
         chain = LLMChain(llm=self.llm, prompt=self.prompt, verbose=PP_VERBOSE)
 

@@ -1,4 +1,6 @@
 import argparse
+from copy import copy, deepcopy
+from queue import PriorityQueue
 from typing import List
 
 from langchain.chains.llm import LLMChain
@@ -92,3 +94,72 @@ class SimpleAgent(BaseAgent):
             if self.db_sess:
                 self.db_sess.add(analysis)
                 self.db_sess.commit()
+
+
+class JobQueueAgent(BaseAgent):
+    def __init__(self, eval_llm, analysis_llm, db_name=None):
+        self.queue = PriorityQueue()
+        super().__init__(eval_llm, analysis_llm, db_name)
+
+        self._cmds = {
+            "Evaluator": Evaluator(self.eval_llm,
+                                   [SequenceMatcherScore(llm=None)]),
+            "Analyzer": Analyzer(self.analysis_llm),
+            "Proposer": Proposer(self.analysis_llm)
+        }
+
+        self._cmd_output = {
+            "Evaluator": "eval_sets",
+            "Analyzer": "analysis",
+            "Proposer": "candidate"
+        }
+
+        self._follow_action = {
+            "Evaluator": "Analyzer",
+            "Analyzer": "Proposer",
+            "Proposer": "Evaluator"
+        }
+
+    def run(self, dataset) -> None:
+
+        data = {
+            "candidate": None,
+            "dataset": dataset,
+            "eval_sets": None,
+            "analysis": None
+        }
+
+        if self.queue.empty():
+            proposer = Proposer(self.analysis_llm)
+            candidate = proposer.propose(dataset)
+
+            self.queue.put((0, {
+                    "cmd": "Proposer",
+                    "data": data
+                }))
+
+        while self.queue:
+            # breakpoint()
+            task = self.queue.get()[1]
+
+            cmd = task["cmd"]
+            logger.info(f"Execute cmd: {cmd}")
+
+            executor = self._cmds[cmd]
+            result = executor.run_cmd(**task["data"])
+            logger.info(f"Result: {result}")
+
+            if self.db_sess:
+                self.db_sess.add(result)
+                self.db_sess.commit()
+
+            data = copy(data)
+            # Cannot use deepcopy here since the copied elements are not
+            # associatiated with any ORM session, which causes error.
+            # Shallow copy() is suitable in this use case to prevent
+            # different tasks accessing the same data object
+
+            data[self._cmd_output[cmd]] = result
+
+            self.queue.put((0, {"cmd": self._follow_action[cmd],
+                                "data": data}))

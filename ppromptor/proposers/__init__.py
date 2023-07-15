@@ -14,9 +14,12 @@ class BaseProposer:
         self.llm = llm
         self.prompt: PromptTemplate
 
-    def propose(self, data) -> PromptCandidate:  # type: ignore[empty-body]
     @abstractmethod
+    def propose(self, dataset, analysis=None, **kwargs) -> PromptCandidate:  # type: ignore[empty-body]
         pass
+
+    def run_cmd(self, **kwargs):
+        return self.propose(**kwargs)
 
 
 class Proposer(BaseProposer):
@@ -67,14 +70,24 @@ class Proposer(BaseProposer):
                                  guidelines=guidelines,
                                  examples=examples_prompt)
 
-    def propose(self, data):
-        chain = LLMChain(llm=self.llm, prompt=self.prompt, verbose=PP_VERBOSE)
+    def propose(self, dataset, analysis=None, **kwargs):
+        if analysis is None:
+            chain = LLMChain(llm=self.llm, prompt=self.prompt, verbose=PP_VERBOSE)
 
-        res = chain({"examples": "\n".join([f"{v+1}. {str(x)}" for v, x in enumerate(data)])})
+            res = chain({"examples": "\n".join([f"{v+1}. {str(x)}" for v, x in enumerate(dataset)])})
 
-        prompt_proposal = res["text"]  # .replace("INSTRUCTION:", "").strip()
+            prompt_proposal = res["text"]  # .replace("INSTRUCTION:", "").strip()
 
-        return self._parse(prompt_proposal)
+            return self._parse(prompt_proposal)
+        else:
+            return PromptCandidate(
+                role=analysis.recommendation.role,
+                goal=analysis.recommendation.goal,
+                guidelines=analysis.recommendation.guidelines,
+                constraints=analysis.recommendation.constraints,
+                examples=analysis.recommendation.examples,
+                output_format=analysis.recommendation.output_format
+            )
 
     def _parse(self, prompt_proposal):
         role = re.findall("role:(.*?)\n",
