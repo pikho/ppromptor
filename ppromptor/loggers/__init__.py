@@ -6,7 +6,11 @@ from loguru import logger as loguru_logger
 class Logger:
     def __init__(self):
         self._logger = loguru_logger
-        self._logger.remove(0)
+        try:
+            self._logger.remove(0)
+        except ValueError:
+            self._logger.warning("Unable to remove previous logger")
+
         self._logger.start(sys.stdout,
                            colorize=True,
                            format="<level>{level}</level> {message}")
