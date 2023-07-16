@@ -15,12 +15,14 @@ from ppromptor.scorefuncs import SequenceMatcherScore
 
 
 class BaseAgent:
-    def __init__(self, eval_llm, analysis_llm, db_name=None):
+    def __init__(self, eval_llm, analysis_llm, db=None):
         self.eval_llm = eval_llm
         self.analysis_llm = analysis_llm
-        if db_name:
-            engine = create_engine(db_name)
+        if isinstance(db, str):
+            engine = create_engine(db)
             self.db_sess = get_session(engine)
+        elif isinstance(db, sqlalchemy.orm.session.Session):
+            self.db_sess = db
         else:
             self.db_sess = None
 
@@ -98,9 +100,9 @@ class SimpleAgent(BaseAgent):
 
 
 class JobQueueAgent(BaseAgent):
-    def __init__(self, eval_llm, analysis_llm, db_name=None) -> None:
-        super().__init__(eval_llm, analysis_llm, db_name)
-        self.queue: BaseJobQueue = ORMJobQueue(session=self.db_sess)
+    def __init__(self, eval_llm, analysis_llm, db=None) -> None:
+        super().__init__(eval_llm, analysis_llm, db)
+        self._queue: BaseJobQueue = ORMJobQueue(session=self.db_sess)
 
         self._cmds: Dict[str, CommandExecutor] = {
             "Evaluator": Evaluator(self.eval_llm,

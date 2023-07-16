@@ -64,5 +64,5 @@ if __name__ == '__main__':
 
     agent = JobQueueAgent(load_lm(args.eval_llm),
                           load_lm(args.analysis_llm),
-                          db_name=args.database_name)
+                          db=sess)
     agent.run(dataset)
