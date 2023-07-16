@@ -2,10 +2,12 @@ import argparse
 from copy import copy, deepcopy
 from typing import Dict, List
 
+import sqlalchemy
 from langchain.chains.llm import LLMChain
 from ppromptor.analyzers import Analyzer
 from ppromptor.base.command import CommandExecutor
 from ppromptor.base.schemas import EvalSet, IOPair, PromptCandidate
+from ppromptor.config import DEFAULT_PRIORITY
 from ppromptor.db import create_engine, get_session
 from ppromptor.evaluators import Evaluator
 from ppromptor.job_queues import BaseJobQueue, ORMJobQueue, PriorityJobQueue
@@ -123,6 +125,15 @@ class JobQueueAgent(BaseAgent):
             "Proposer": "Evaluator"
         }
 
+    def get_runner(self, cmd_s: str):
+        return self._cmds[cmd_s]
+
+    def add_command(self, cmd_s: str, data: dict, priority: int):
+        self._queue.put({
+                "cmd": cmd_s,
+                "data": data
+            }, priority)        
+
     def run(self, dataset) -> None:
 
         data = {
@@ -132,22 +143,17 @@ class JobQueueAgent(BaseAgent):
             "analysis": None
         }
 
-        if self.queue.empty():
+        if self._queue.empty():
+            self.add_command("Proposer", data, DEFAULT_PRIORITY)
 
-            self.queue.put({
-                    "cmd": "Proposer",
-                    "data": data
-                }, 0)
+        while not self._queue.empty():
+            task = self._queue.get()[1]
 
-        while not self.queue.empty():
-            # breakpoint()
-            task = self.queue.get()[1]
+            cmd_s = task["cmd"]
+            logger.info(f"Execute cmd: {cmd_s}")
 
-            cmd = task["cmd"]
-            logger.info(f"Execute cmd: {cmd}")
-
-            executor = self._cmds[cmd]
-            result = executor.run_cmd(**task["data"])
+            runner = self.get_runner(cmd_s)
+            result = runner.run_cmd(**task["data"])
             logger.info(f"Result: {result}")
 
             if self.db_sess:
@@ -160,8 +166,7 @@ class JobQueueAgent(BaseAgent):
             # Shallow copy() is suitable in this use case to prevent
             # different tasks accessing the same data object
 
-            data[self._cmd_output[cmd]] = result
+            data[self._cmd_output[cmd_s]] = result
 
-            self.queue.put({"cmd": self._follow_action[cmd],
-                            "data": data}, 0)
-            self.queue.done(task, 2)
+            self.add_command(self._follow_action[cmd_s], data, DEFAULT_PRIORITY)
+            self._queue.done(task, 2)
