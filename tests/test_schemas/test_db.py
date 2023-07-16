@@ -43,7 +43,7 @@ def test_objs():
 
         eval_result = EvalResult(
                 evaluator_name="evaluator",
-                prompt=candidate,
+                candidate=candidate,
                 data=iopair,
                 prediction="",
                 scores={},

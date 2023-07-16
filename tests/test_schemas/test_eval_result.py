@@ -6,7 +6,7 @@ from ppromptor.base.schemas import (Analysis, EvalResult, EvalSet, IOPair,
 def test_EvalResult():
     res = EvalResult(
             evaluator_name="evaluator",
-            prompt=None,
+            candidate=None,
             data="",
             prediction="",
             scores={},
@@ -17,7 +17,7 @@ def test_EvalResult():
 def test_EvalSet():
     res1 = EvalResult(
             evaluator_name="evaluator",
-            prompt=None,
+            candidate=None,
             data="",
             prediction="",
             scores={},
@@ -26,7 +26,7 @@ def test_EvalSet():
 
     res2 = EvalResult(
             evaluator_name="evaluator",
-            prompt=None,
+            candidate=None,
             data="",
             prediction="",
             scores={},

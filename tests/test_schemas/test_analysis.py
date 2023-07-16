@@ -27,7 +27,7 @@ def test_Analysis_req_params():
 def test_Analysis_3():
     res = EvalResult(
             evaluator_name="evaluator",
-            prompt=None,
+            candidate=None,
             data=[],
             prediction="",
             scores={},
