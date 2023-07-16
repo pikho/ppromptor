@@ -112,7 +112,7 @@ class ORMJobQueue(BaseJobQueue):
     def empty(self) -> bool:
         count = (self._sess.query(Command)
                  .filter_by(state=0)
-                 .order_by(Command.priority.desc())
+                 .order_by(Command.priority.asc())
                  .count())
         return count == 0
 
