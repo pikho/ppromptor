@@ -152,6 +152,10 @@ class JobQueueAgent(BaseAgent):
             cmd_s = task["cmd"]
             logger.info(f"Execute cmd: {cmd_s}")
 
+            for k, v in task["data"].items():
+                if v:
+                    data[k] = v
+
             runner = self.get_runner(cmd_s)
             result = runner.run_cmd(**task["data"])
             logger.info(f"Result: {result}")
