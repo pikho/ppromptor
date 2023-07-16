@@ -89,10 +89,10 @@ class EvalResult(Base):
     scores: Mapped[Dict[str, float]] = Column(JSON)
     llm_params: Mapped[Dict[str, Any]] = Column(JSON)
 
-    prompt_id: Mapped[int] = mapped_column(ForeignKey("prompt_candidate.id"),
-                                           default=None)
-    data_id: Mapped[int] = mapped_column(ForeignKey("io_pair.id"),
-                                         default=None)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("prompt_candidate.id"), default=None)
+    data_id: Mapped[int] = mapped_column(
+        ForeignKey("io_pair.id"), default=None)
 
     def __str__(self):
         return (f"Input: [{self.data.input}],"
@@ -110,9 +110,8 @@ class EvalSet(Base):
         secondary=association_result_set, default_factory=list)
     scores: Mapped[Dict[str, float]] = Column(JSON, default={})
     final_score: Mapped[float] = mapped_column(default=None)
-
-    prompt_id: Mapped[int] = mapped_column(ForeignKey("prompt_candidate.id"),
-                                           default=None)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("prompt_candidate.id"), default=None)
 
 
 @dataclass_json
