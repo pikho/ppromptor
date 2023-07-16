@@ -7,23 +7,9 @@ from ppromptor.agent import JobQueueAgent, SimpleAgent
 from ppromptor.base.schemas import IOPair
 from ppromptor.db import create_engine, get_session
 from ppromptor.loggers import logger
+from ppromptor.utils import load_lm
 
 if __name__ == '__main__':
-
-    def load_lm(name):
-        if name == "mlego_wizardlm":
-            from ppromptor.llms.mlego_llm import WizardLLM
-
-            return WizardLLM()
-        elif name == "wizardlm":
-            from ppromptor.llms.wizardlm import WizardLLM
-
-            return WizardLLM()
-        elif name == "chatgpt":
-            from langchain.chat_models import ChatOpenAI
-
-            return ChatOpenAI(model_name='gpt-3.5-turbo',
-                              temperature=0.1)
 
     def parse_args():
         parser = argparse.ArgumentParser(

@@ -72,3 +72,19 @@ def gen_prompt(goal: Union[str, PromptTemplate],
 
     return PromptTemplate(template=prompt_str,
                           input_variables=input_variables)
+
+
+def load_lm(name):
+    if name == "mlego_wizardlm":
+        from ppromptor.llms.mlego_llm import WizardLLM
+
+        return WizardLLM()
+    elif name == "wizardlm":
+        from ppromptor.llms.wizardlm import WizardLLM
+
+        return WizardLLM()
+    elif name == "chatgpt":
+        from langchain.chat_models import ChatOpenAI
+
+        return ChatOpenAI(model_name='gpt-3.5-turbo',
+                          temperature=0.1)
