@@ -133,8 +133,6 @@ class JobQueueAgent(BaseAgent):
         }
 
         if self.queue.empty():
-            proposer = Proposer(self.analysis_llm)
-            candidate = proposer.propose(dataset)
 
             self.queue.put({
                     "cmd": "Proposer",
