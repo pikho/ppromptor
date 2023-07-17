@@ -161,18 +161,18 @@ class Analyzer(BaseAnalyzer):
             revision = ""
 
         try:
-            role = re.findall('ROLE:(.*?)\n', res, re.IGNORECASE)[0]
+            role = re.findall('ROLE:(.*?)\n', output, re.IGNORECASE)[0]
         except IndexError:
             role = ""
 
         try:
-            goal = re.findall('GOAL:(.*?)\n', res, re.IGNORECASE)[0]
+            goal = re.findall('GOAL:(.*?)\n', output, re.IGNORECASE)[0]
         except IndexError:
             goal = ""
 
         try:
             guidelines = re.findall('GUIDELINES:(.*?)CONSTRAINTS',
-                                    res,
+                                    output,
                                     re.DOTALL | re.IGNORECASE)[0]
 
             guidelines = re.findall('\d\.(.*?)\n',
@@ -182,7 +182,7 @@ class Analyzer(BaseAnalyzer):
 
         try:
             constraints = re.findall('CONSTRAINTS:(.*)',
-                                     res,
+                                     output,
                                      re.DOTALL | re.IGNORECASE)[0]
             constraints = re.findall('\d\.(.*?)\n',
                                      constraints)
