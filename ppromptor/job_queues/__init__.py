@@ -96,7 +96,7 @@ class ORMJobQueue(BaseJobQueue):
     def get(self) -> Tuple[int, Any]:
         cmd = (self._sess.query(Command)
                .filter_by(state=0)
-               .order_by(Command.priority.desc())
+               .order_by(Command.priority.asc())
                .first())
         cmd.state = 1
         self._sess.add(cmd)
