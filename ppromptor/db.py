@@ -51,6 +51,48 @@ def get_analysis(sess):
     return sess.query(Analysis).all()
 
 
+def get_analysis_by_id(sess, id):
+    return sess.query(Analysis).filter_by(id=id)[0]
+
+
+def get_analysis_by_candidate_id(sess, candidate_id):
+    res = sess.query(Analysis).join(EvalSet, Analysis.eval_sets).filter(
+        EvalSet.candidate_id == candidate_id).one()
+    return res
+
+
+def get_candidates_with_score(sess):
+    return sess.query(PromptCandidate.id,
+                      EvalSet.final_score,
+                      PromptCandidate.role,
+                      PromptCandidate.goal) \
+               .join(EvalSet) \
+               .order_by(EvalSet.final_score.desc())\
+               .all()
+
+
+CMD_STATE_CODE = {
+    0: "W",
+    1: "R",
+    2: "S",
+    3: "F"
+}
+
+
+def get_commands_as_dict(sess, limit=10):
+    cmds = (sess.query(Command)
+            # .order_by(Command.priority.asc())
+            .order_by(Command.id.desc())
+            .limit(limit)
+            .all()
+            )
+    cmds = [{"id": x.id,
+             "cmd": x.cmd["cmd"],
+             "state": CMD_STATE_CODE[x.state],
+             "priority": x.priority,
+             # "owner": x.owner
+             } for x in cmds]
+    return cmds
 if __name__ == '__main__':
     engine = create_engine('test3.db')
     sess = get_session(engine)
