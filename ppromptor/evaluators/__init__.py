@@ -68,7 +68,7 @@ class Evaluator(BaseEvaluator):
         self._prompt_str = ("You are a {role}."
                             " Base on below INPUT, {goal}\n") + """
         INPUT:
-        {input}
+        '{input}'
 
         GUIDELINES:
         {guidelines}
