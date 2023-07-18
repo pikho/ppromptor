@@ -32,6 +32,8 @@ global engine
 global sess
 global db_path
 
+os.environ["OPENAI_API_KEY"] = "NONE"
+
 
 def save_config(cfg_data, path):
     with open(path, 'w') as f:
