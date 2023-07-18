@@ -103,6 +103,7 @@ class ORMJobQueue(BaseJobQueue):
         self._sess.commit()
 
         job = {
+            "id": cmd.id,
             "cmd": cmd.cmd["cmd"],
             "data": self._deserialize_data(cmd.data),
             "orig_obj": cmd
