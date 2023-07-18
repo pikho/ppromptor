@@ -106,7 +106,7 @@ class WizardLM(LLM):
             values["tokenizer"] = tokenizer
 
         except Exception as e:
-            raise Exception(f"MosaicML failed to load with error: {e}")
+            raise Exception(f"WizardLM failed to load with error: {e}")
         return values
 
     @property
@@ -114,7 +114,7 @@ class WizardLM(LLM):
         """Get the identifying parameters."""
         return {
             "model": self.model_name,
-            **self._default_params(),
+            **self._default_params,
             **{
                 k: v
                 for k, v in self.__dict__.items()
