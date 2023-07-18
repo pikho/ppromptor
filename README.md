@@ -100,5 +100,7 @@ Press the `Start` button to activate the workflow.
 5. Prompt Candidates
 Generated prompts can be found in the `Prompt Candidates` tab. Users can modify generated prompts by selecting only 1 Candidate, then modifying the prompt, then `Create Prompt`. This new prompt will be evaluated by Evaluator agent and then keep improving by Analyzer agent. By selecting 2 prompts, we can compare these prompts side by side.
 
+![Compare Prompts](https://github.com/pikho/ppromptor/blob/main/doc/images/cmp_candidates-1.png?raw=true)
+
 ![Compare Prompts](https://github.com/pikho/ppromptor/blob/main/doc/images/cmp_candidates-2.png?raw=true)
 
