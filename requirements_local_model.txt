@@ -1,0 +1,5 @@
+pydantic
+transformers
+torch
+auto_gptq==0.2.2
+langchain
