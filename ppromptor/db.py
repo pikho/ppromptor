@@ -31,6 +31,23 @@ def get_dataset(sess):
     return sess.query(IOPair).all()
 
 
+def get_iopair_by_id(sess, id):
+    return sess.query(IOPair).filter_by(id=id).one()
+
+
+def add_iopair(sess, input_, output_):
+    iopair = IOPair(input=input_, output=output_)
+    sess.add(iopair)
+    sess.commit()
+
+
+def update_iopair(sess, id, input_, output_):
+    iopair = get_iopair_by_id(sess, id)
+    iopair.input = input_
+    iopair.output = output_
+    sess.add(iopair)
+    sess.commit()
+
 def get_candidates(sess):
     return sess.query(PromptCandidate).all()
 
