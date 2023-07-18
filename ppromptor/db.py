@@ -36,7 +36,7 @@ def get_candidates(sess):
 
 
 def get_candidate_by_id(sess, id):
-    return sess.query(PromptCandidate).filter_by(id=id)[0]
+    return sess.query(PromptCandidate).filter_by(id=id).one()
 
 
 def get_results(sess):
@@ -52,7 +52,7 @@ def get_analysis(sess):
 
 
 def get_analysis_by_id(sess, id):
-    return sess.query(Analysis).filter_by(id=id)[0]
+    return sess.query(Analysis).filter_by(id=id).one()
 
 
 def get_analysis_by_candidate_id(sess, candidate_id):
