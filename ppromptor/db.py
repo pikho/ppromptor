@@ -108,6 +108,21 @@ def get_commands_as_dict(sess, limit=10):
              # "owner": x.owner
              } for x in cmds]
     return cmds
+
+
+def reset_running_cmds(sess):
+    """
+    Reset state of running cmds to 0 (waiting)
+    """
+    cmds = sess.query(Command).filter_by(state=1).all()
+
+    for cmd in cmds:
+        cmd.state = 0
+        sess.add(cmd)
+        logger.debug(f"Command(id={cmd.id}, state={cmd.state}) state reseted")
+
+    sess.commit()
+
 if __name__ == '__main__':
     engine = create_engine('test3.db')
     sess = get_session(engine)
