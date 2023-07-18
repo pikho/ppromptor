@@ -5,6 +5,12 @@ from ppromptor.base.schemas import (Analysis, Command, EvalResult, EvalSet,
 from sqlalchemy import create_engine as slc_create_engine
 from sqlalchemy.orm import Session
 
+CMD_STATE_CODE = {
+    0: "W",
+    1: "R",
+    2: "S",
+    3: "F"
+}
 
 def create_engine(db_path, echo=False):
     engine = slc_create_engine(f"sqlite+pysqlite:///{db_path}", echo=echo)
@@ -86,14 +92,6 @@ def get_candidates_with_score(sess):
                .join(EvalSet) \
                .order_by(EvalSet.final_score.desc())\
                .all()
-
-
-CMD_STATE_CODE = {
-    0: "W",
-    1: "R",
-    2: "S",
-    3: "F"
-}
 
 
 def get_commands_as_dict(sess, limit=10):
