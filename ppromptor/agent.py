@@ -8,7 +8,7 @@ from ppromptor.analyzers import Analyzer
 from ppromptor.base.command import CommandExecutor
 from ppromptor.base.schemas import EvalSet, IOPair, PromptCandidate
 from ppromptor.config import DEFAULT_PRIORITY
-from ppromptor.db import create_engine, get_session
+from ppromptor.db import create_engine, get_session, reset_running_cmds
 from ppromptor.evaluators import Evaluator
 from ppromptor.job_queues import BaseJobQueue, ORMJobQueue, PriorityJobQueue
 from ppromptor.loggers import logger
@@ -27,6 +27,21 @@ class BaseAgent:
             self.db_sess = db
         else:
             self.db_sess = None
+        self._agent_state = 0  # 0: stoped, 1: running 2: waiting for stopping
+
+    @property
+    def state(self):
+        return self._agent_state
+
+    @state.setter
+    def state(self, state: int):
+        assert state in [0, 1, 2]
+
+        self._agent_state = state
+
+    def stop(self):
+        self.state = 2
+        logger.info(f" agent call stop, state {self.state}")
 
     def run(self, dataset) -> None:
         pass
@@ -136,6 +151,10 @@ class JobQueueAgent(BaseAgent):
 
     def run(self, dataset) -> None:
 
+        self.state = 1
+
+        reset_running_cmds(self.db_sess)
+
         data = {
             "candidate": None,
             "dataset": dataset,
@@ -146,11 +165,12 @@ class JobQueueAgent(BaseAgent):
         if self._queue.empty():
             self.add_command("Proposer", data, DEFAULT_PRIORITY)
 
-        while not self._queue.empty():
-            task = self._queue.get()[1]
+        while self.state == 1 and (not self._queue.empty()):
+            priority, task = self._queue.get()
 
+            task_id = task["id"]
             cmd_s = task["cmd"]
-            logger.info(f"Execute cmd: {cmd_s}")
+            logger.info(f"Execute Command(cmd={cmd_s}, id={task_id})")
 
             for k, v in task["data"].items():
                 if v:
@@ -172,5 +192,9 @@ class JobQueueAgent(BaseAgent):
 
             data[self._cmd_output[cmd_s]] = result
 
-            self.add_command(self._follow_action[cmd_s], data, DEFAULT_PRIORITY)
+            self.add_command(self._follow_action[cmd_s],
+                             data,
+                             DEFAULT_PRIORITY)
             self._queue.done(task, 2)
+
+        self.state = 0
