@@ -49,34 +49,6 @@ cd <path_to_ppromptor>/ppromptor/llms
 python wizardlm.py
 ```
 
-Rewrite below article in formal English
-
-
-## Usages
-
-1. Start Web App
-```
-cd <path_to_ppromptor>
-streamlit streamlit run ui/app.py
-```
-
-2. Load Demo Project
-Load `examples/antonyms.db` for demo purpose. This demostrate how to guide WizardLM to generate antonyms for given inputs.
-
-3. Configuration
-In Configuration page, set `Target LLM` as `wizardlm` if you can infer this model locally. Or choose both `Target LLM` and `Analysis LLM` as `chatgpt`. If chatgpt is used, please provide OpenAI API Key.
-
-4. Load dataset
-The demo project already loaded 5 records. You can add your own dataset.
-
-5. Start Wordload
-Press `Start` button to activate the workflow.
-
-5. Prompt Candidates
-Generated prompts can be found in `Prompt Candidates` tab. Users can modify generated prompts by selecting only 1 Prompt Candidate, then modifying the prompt, then `Create Prompt`. By selecting 2 prompts, we can compare these prompts side by side.
-
-
-
 ## Usage
 
 1. Start the Web App
