@@ -66,6 +66,10 @@ def get_results(sess):
     return sess.query(EvalResult).all()
 
 
+def get_result_by_id(sess, id):
+    return sess.query(EvalResult).filter_by(id=id).one()
+
+
 def get_eval_sets(sess):
     return sess.query(EvalSet).all()
 
