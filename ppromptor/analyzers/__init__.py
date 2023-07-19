@@ -12,6 +12,7 @@ from ppromptor.base.schemas import (Analysis, EvalResult, EvalSet,
                                     PromptCandidate, Recommendation)
 from ppromptor.config import PP_VERBOSE
 from ppromptor.loggers import logger
+from ppromptor.scorefuncs import score_func_selector
 from ppromptor.utils import bulletpointize, get_llm_params
 
 
@@ -33,7 +34,8 @@ class BaseAnalyzer(CommandExecutor):
                                  "guidelines",
                                  "constraints",
                                  "prediction_anwsers",
-                                 "evaluation_scores"])
+                                 "evaluation_scores",
+                                 "score_funcs"])
         return self._prompt
 
     def _validate_prompt(self):
@@ -78,10 +80,9 @@ class Analyzer(BaseAnalyzer):
 
         Evaluation Scores:
         {evaluation_scores}
-        Above score is calculated by a string similarity algorithm. The highest
-        score is 1.0, whcih means prediction is exactly the same as the expected
-        answer; the lowest score is 0.0 which means prediction is far away closed
-        to expected answer.
+        
+        Description of Evaluation Functions:
+        {score_funcs}
 
         Please refer above evaluation scores and describe the difference
         between preditions and expected answers. And explain why the given 
@@ -106,7 +107,6 @@ class Analyzer(BaseAnalyzer):
             ...
 
         Ok, now, lets think step by step.
-
         """
         super().__init__(llm)
 
@@ -124,13 +124,22 @@ class Analyzer(BaseAnalyzer):
         pred = "\n".join(["\n".join([str(x) for x in r_set.results]) for r_set in results])
         eval_scores = "\n".join(["\n".join([str(x.scores) for x in r_set.results]) for r_set in results])
 
+        used_scorefunc_names = set()
+        for r_set in results:
+            for result in r_set.results:
+                for key in result.scores.keys():
+                    used_scorefunc_names.add(key)
+
+        score_funcs = score_func_selector(list(used_scorefunc_names))
+        score_funcc_desc = [f"{func.__name__}: {func().description}" for func in score_funcs]  # type: ignore[attr-defined, operator]
         value = {
             "role": candidate.role,
             "goal": candidate.goal,
             "guidelines": bulletpointize(candidate.guidelines),
             "constraints": bulletpointize(candidate.constraints),
             "prediction_anwsers": pred,
-            "evaluation_scores": eval_scores
+            "evaluation_scores": eval_scores,
+            "score_funcs": bulletpointize(score_funcc_desc)
         }
 
         res = chain(value)
