@@ -27,6 +27,7 @@ Prompt-Promptor(or shorten for ppromptor) is a Python library designed to automa
 
 ![Compare Prompts](https://github.com/pikho/ppromptor/blob/main/doc/images/concept.png?raw=true)
 
+A more detailed class diagram could be found in [doc](https://github.com/pikho/ppromptor/tree/main/doc)
 
 ## Installations
 
