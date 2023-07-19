@@ -18,7 +18,10 @@ Prompt-Promptor(or shorten for ppromptor) is a Python library with a web interfa
 
 - 🏳️‍🌈 Open Source.
 
-<hr/>
+## Warning
+- This project is currently in its earily stage, and it is anticipated that there will be major design changes in the future.
+
+- The main function utilizes an infinite loop to enhance the generation of prompts. If you opt for OpenAI's ChatGPT as Target/Analysis LLMs, kindly ensure that you set a usage limit.
 
 ## Concept
 
@@ -63,8 +66,6 @@ cd <path_to_ppromptor>/ppromptor/llms
 python wizardlm.py
 ```
 
-<hr/>
-
 ## Usage
 
 1. Start the Web App
@@ -92,3 +93,5 @@ Generated prompts can be found in the `Prompt Candidates` tab. Users can modify 
 
 ![Compare Prompts](https://github.com/pikho/ppromptor/blob/main/doc/images/cmp_candidates-2.png?raw=true)
 
+## Contribution
+We welcome all kinds of contributions, including new feature requests, bug fixes, new feature implementation, examples, and documentation updates. If you have a specific request, please use the "Issues" section. For other contributions, simply create a pull request (PR). Your participation is highly valued in improving our project. Thank you!
