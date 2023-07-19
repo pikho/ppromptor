@@ -153,6 +153,15 @@ class JobQueueAgent(BaseAgent):
 
         self.state = 1
 
+        # FIXME: This is a workround for incompleted commands
+        # Background: When a command is popped from the queue,
+        # its state is set to 1 (running). However, if the process
+        # is interupted before the task finishes, it will
+        # be ignored. This workaround will reset all
+        # tasks with a stat of 1 to 0 at the begining of run(), which
+        # assume that only one agent can access the queue.
+        # Using Context Manager should be a better way to fix this.
+
         reset_running_cmds(self.db_sess)
 
         data = {
