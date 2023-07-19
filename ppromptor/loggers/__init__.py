@@ -11,9 +11,9 @@ class Logger:
         except ValueError:
             self._logger.warning("Unable to remove previous logger")
 
-        self._logger.start(sys.stdout,
-                           colorize=True,
-                           format="<level>{level}</level> {message}")
+        self._logger.add(sys.stdout,
+                         colorize=True,
+                         format="<level>{level}</level> {message}")
 
     def trace(self, message):
         self._logger.trace(message)
