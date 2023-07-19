@@ -149,7 +149,7 @@ class JobQueueAgent(BaseAgent):
                 "data": data
             }, priority)        
 
-    def run(self, dataset) -> None:
+    def run(self, dataset, epochs=-1) -> None:
 
         self.state = 1
 
@@ -173,6 +173,8 @@ class JobQueueAgent(BaseAgent):
 
         if self._queue.empty():
             self.add_command("Proposer", data, DEFAULT_PRIORITY)
+
+        acc_epochs = 0
 
         while self.state == 1 and (not self._queue.empty()):
             priority, task = self._queue.get()
@@ -205,5 +207,11 @@ class JobQueueAgent(BaseAgent):
                              data,
                              DEFAULT_PRIORITY)
             self._queue.done(task, 2)
+
+            acc_epochs += 1
+
+            if acc_epochs == epochs:
+                self.state = 0
+                return None
 
         self.state = 0
