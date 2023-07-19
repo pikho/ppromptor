@@ -1,5 +1,5 @@
 from ppromptor.base.schemas import IOPair
-from ppromptor.scorefuncs import SequenceMatcherScore
+from ppromptor.scorefuncs import SequenceMatcherScore, score_func_selector
 
 
 def test_SequenceMatcherScore():
@@ -8,6 +8,11 @@ def test_SequenceMatcherScore():
     pred = "aaa bbb ccc"
     s = SequenceMatcherScore.score(None, rec, pred)
     assert s == 1.0
+
+
+def test_selector():
+    res = score_func_selector('SequenceMatcherScore')
+    assert len(res) == 1
 
 
 if __name__ == '__main__':
