@@ -21,10 +21,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements_test.txt
-      - name: set pythonpath
-        run: |
-          echo "PYTHONPATH=PYTHONPATH:/home/runner/work/pprompt" >> $GITHUB_ENV
 
       - name: Test with pytest
         run: |
+          echo "PYTHONPATH=/home/runner/work/pprompt" >> $GITHUB_ENV
+          export PYTHONPATH=/home/runner/work/pprompt
           pytest
