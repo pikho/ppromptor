@@ -24,6 +24,6 @@ jobs:
 
       - name: Test with pytest
         run: |
-          echo "PYTHONPATH=/home/runner/work/pprompt" >> $GITHUB_ENV
-          export PYTHONPATH=/home/runner/work/pprompt
+          echo "PYTHONPATH=/home/runner/work/pprompt/pprompt" >> $GITHUB_ENV
+          export PYTHONPATH=/home/runner/work/pprompt/pprompt
           pytest
