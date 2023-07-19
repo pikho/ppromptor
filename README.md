@@ -2,13 +2,31 @@
 
 Prompt-Promptor(or shorten for ppromptor) is a Python library with a web interface that automatically generates and improves prompts for LLMs. It adapts concepts from autonomous agents (e.g., AutoGPT), and comprises three agents: Proposer, Evaluator, and Analyzer. These agents work together to continuously improve the generated prompts.
 
-## Features:
+<hr/>
 
-1. 🤖 The use of powerful LLMs (eg, GPT4) to analyze and generate prompts for less-powerful LLMs(eg, Llama).
+Rewrite below content in formal english for marketing purpose
 
-2. 👨‍👨‍👧‍👦 Collaboration with human experts.
+## 🚀 Features:
 
-3. 💼 Prompt experiment management.
+- 🤖 The use of LLMs to prompt themself by giving few samples.
+
+- 💪 Guidance for OSS LLMs(eg, LLaMA) by more powerful LLMs(eg, GPT4)
+
+- 📈 Continuously improvement.
+
+- 👨‍👨‍👧‍👦 Collaboration with human experts.
+
+- 💼 Experiment management for prompt engineering.
+
+- 🖼 Web GUI interface.
+
+- 🏳️‍🌈 Open Source.
+
+<hr/>
+
+## Concept
+
+![Compare Prompts](https://github.com/pikho/ppromptor/blob/main/doc/images/concept.png?raw=true)
 
 
 ## Installations
@@ -48,6 +66,8 @@ pip install requirements_local_model.txt
 cd <path_to_ppromptor>/ppromptor/llms
 python wizardlm.py
 ```
+
+<hr/>
 
 ## Usage
 
