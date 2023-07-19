@@ -134,7 +134,7 @@ class JobQueueAgent(BaseAgent):
             "Proposer": "candidate"
         }
 
-        self._follow_action = {
+        self._next_action = {
             "Evaluator": "Analyzer",
             "Analyzer": "Proposer",
             "Proposer": "Evaluator"
@@ -192,7 +192,7 @@ class JobQueueAgent(BaseAgent):
 
             data[self._cmd_output[cmd_s]] = result
 
-            self.add_command(self._follow_action[cmd_s],
+            self.add_command(self._next_action[cmd_s],
                              data,
                              DEFAULT_PRIORITY)
             self._queue.done(task, 2)
