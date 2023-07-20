@@ -1,6 +1,7 @@
 import codecs
 import os
 import re
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
@@ -21,6 +22,9 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
+
 setup(
     name="ppromptor",
     version=find_version("ppromptor", "__init__.py"),
@@ -28,6 +32,8 @@ setup(
     author="Pikho Tan",
     author_email="pikho.tan@gmail.com",
     description="An autonomous agent framework for prompt engineering",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=find_packages(exclude=["*_private_llms*"]),
     package_data={"ppromptor": ["examples/*"]},
     scripts=['scripts/ppromptor-cli.py'],
