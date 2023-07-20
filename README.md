@@ -32,27 +32,21 @@ A more detailed class diagram could be found in [doc](https://github.com/pikho/p
 ## Installations
 
 ### From Github
-1. Clone Repository from Github
+
+1. Install Package
+```
+pip install ppromptor --upgrade
+```
+
+2. Clone Repository from Github
 ```
 git clone https://github.com/pikho/ppromptor.git
+```
+
+3. Start Web UI
+```
 cd ppromptor
-```
-
-2. Install Required Packages
-```
-pip install -r requirements.txt
-```
-
-3. Add Package Path to PythonPath
-```
-export PYTHONPATH=PYTHONPATH:<path_to_repo>/ppromptor
-```
-
-4. Run Tests
-```
-pip install -r requirements_test.txt
-
-pytest
+streamlit run ui/app.py
 ```
 
 ### Running Local Model(WizardLM)
