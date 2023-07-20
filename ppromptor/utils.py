@@ -76,7 +76,7 @@ def gen_prompt(goal: Union[str, PromptTemplate],
 
 def load_lm(name):
     if name == "mlego_wizardlm":
-        from ppromptor.llms.mlego_llm import WizardLLM
+        from ppromptor._private_llms.mlego_llm import WizardLLM
 
         return WizardLLM()
     elif name == "wizardlm":

@@ -29,6 +29,7 @@ setup(
     author_email="pikho.tan[at]gmail.com",
     description="A framework for automatic prompt generation",
     packages=find_packages(exclude=["llms"]),
+    packages=find_packages(exclude=["*_private_llms*"]),
     package_data={"ppromptor": ["examples/*"]},
     scripts=['scripts/ppromptor-main.py'],
     install_requires=[
