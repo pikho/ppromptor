@@ -26,24 +26,23 @@ setup(
     version=find_version("ppromptor", "__init__.py"),
     url="https://github.com/pikho/ppromptor",
     author="Pikho Tan",
-    author_email="pikho.tan[at]gmail.com",
-    description="A framework for automatic prompt generation",
-    packages=find_packages(exclude=["llms"]),
+    author_email="pikho.tan@gmail.com",
+    description="An autonomous agent framework for prompt engineering",
+    packages=find_packages(exclude=["*_private_llms*"]),
     package_data={"ppromptor": ["examples/*"]},
-    scripts=['scripts/ppromptor-main.py'],
+    scripts=['scripts/ppromptor-cli.py'],
     install_requires=[
         "langchain", "loguru", "dataclasses_json",
-        "torch", "auto_gptq", "requests", "openai", "transformers",
-        "sqlalchemy"
+        "requests", "openai", "sqlalchemy",
+        "beautifulsoup4",
+        "streamlit", "streamlit-diff-viewer", "streamlit-autorefresh",
+        "streamlit-aggrid"
     ],
     include_package_data=True,
     extras_require={
-        'docs': [
-            'sphinx'
-        ],
-        'test': [
-            'pytest'
-        ]
+        'docs': ['sphinx'],
+        'test': ['pytest'],
+        'local-llms': ["torch", "auto_gptq", "transformers"]
     },
-    python_requires=">=3.10",
+    python_requires=">=3.8",
 )

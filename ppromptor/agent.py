@@ -134,7 +134,7 @@ class JobQueueAgent(BaseAgent):
             "Proposer": "candidate"
         }
 
-        self._follow_action = {
+        self._next_action = {
             "Evaluator": "Analyzer",
             "Analyzer": "Proposer",
             "Proposer": "Evaluator"
@@ -149,9 +149,18 @@ class JobQueueAgent(BaseAgent):
                 "data": data
             }, priority)        
 
-    def run(self, dataset) -> None:
+    def run(self, dataset, epochs=-1) -> None:
 
         self.state = 1
+
+        # FIXME: This is a workround for incompleted commands
+        # Background: When a command is popped from the queue,
+        # its state is set to 1 (running). However, if the process
+        # is interupted before the task finishes, it will
+        # be ignored. This workaround will reset all
+        # tasks with a stat of 1 to 0 at the begining of run(), which
+        # assume that only one agent can access the queue.
+        # Using Context Manager should be a better way to fix this.
 
         reset_running_cmds(self.db_sess)
 
@@ -164,6 +173,8 @@ class JobQueueAgent(BaseAgent):
 
         if self._queue.empty():
             self.add_command("Proposer", data, DEFAULT_PRIORITY)
+
+        acc_epochs = 0
 
         while self.state == 1 and (not self._queue.empty()):
             priority, task = self._queue.get()
@@ -192,9 +203,15 @@ class JobQueueAgent(BaseAgent):
 
             data[self._cmd_output[cmd_s]] = result
 
-            self.add_command(self._follow_action[cmd_s],
+            self.add_command(self._next_action[cmd_s],
                              data,
                              DEFAULT_PRIORITY)
             self._queue.done(task, 2)
+
+            acc_epochs += 1
+
+            if acc_epochs == epochs:
+                self.state = 0
+                return None
 
         self.state = 0

@@ -111,3 +111,4 @@ venv.bak/
 
 
 .pytest_cache/
+*_private_llms/

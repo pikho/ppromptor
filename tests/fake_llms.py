@@ -33,3 +33,7 @@ class FakeListLLM(LLM):
     @property
     def _identifying_params(self) -> Mapping[str, Any]:
         return {}
+
+    @property
+    def _default_params(self):
+        return {}
