@@ -63,7 +63,7 @@ def enable_config(cfg_data):
 
 
 def render_db_cfg():
-    db_path = st.text_input('Database Name/Path', 'examples/antonyms.db')
+    db_path = st.text_input('Database Name/Path', 'examples/antonyms/antonyms.db')
     if os.path.exists(db_path):
         btn_db = st.button('Load')
     else:
