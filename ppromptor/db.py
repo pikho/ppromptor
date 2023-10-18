@@ -127,6 +127,7 @@ def reset_running_cmds(sess):
 
     sess.commit()
 
+
 if __name__ == '__main__':
     engine = create_engine('test3.db')
     sess = get_session(engine)
